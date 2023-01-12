@@ -103,13 +103,12 @@ cv.Grid$MAE <- NA
 cv.Grid$RMSE_2 <- NA
 
 
-#loop cv
+#leave one out cross validation 
 
 cv.Grid=read.csv("cv.Grid_variable_multidist.csv")
 names(cv.Grid)
 cv.Grid=cv.Grid[,-1]
 
-cv_var=subset(cv_var, !is.na(cv_var$RMSE))
 
 for (i in 1:nrow(cv.Grid)){
   print(i)
@@ -135,47 +134,9 @@ for (i in 1:nrow(cv.Grid)){
 
 cv.Grid$Date=gsub("^x", "", cv.Grid$Day)
 cv.Grid$Date=ymd(cv.Grid$Date)
-write.csv(cv.Grid, file="cv.Grid_humidity_multdist_nolog_final_3.csv")
+write.csv(cv.Grid, file="cv.Grid_humidity_multdist.csv")
 
-#do it a scatter-plot for cv results!
-
-names(cv.Grid)
-cv.Grid=cv.Grid[,-c(9,10)]
-
-cv.Grid0=read.csv("cv.Grid_var_2012_2013_ndist.csv")
-cv.Grid1=read.csv("cv.Grid_var_2014_2015_ndist.csv")
-cv.Grid2=read.csv("cv.Grid_var_2016_2017_ndist.csv")
-
-names(cv.Grid0)
-names(cv.Grid1)
-cv.Grid1=cv.Grid1[,-c(1)]
-cv.Grid0=cv.Grid0[,-c(1)]
-cv.Grid2=cv.Grid2[,-c(1)]
-
-cv.Grid=rbind.data.frame(cv.Grid0, cv.Grid1)
-cv.Grid=rbind.data.frame(cv.Grid, cv.Grid2)
-
-rm(cv.Grid0, cv.Grid1)
-
-
-cv.Grid1=read.csv("cv.Grid_variable_log_multdist_1.csv")
-cv.Grid2=read.csv("cv.Grid_variable_log_multdist_2.csv")
-
-cv.Grid_dist=rbind.data.frame(cv.Grid1,cv.Grid2)
-names(cv.Grid_dist)
-cv.Grid_dist=cv.Grid_dist[,-c(1)]
-rm(cv.Grid1, cv.Grid2)
-
-#loocv results
-cv.Grid$RMSE_nlog=exp(cv.Grid$RMSE)-1
-cv.Grid$MAE_nlog=exp(cv.Grid$MAE)-1
-
-cv.Grid_dist$RMSE_nlog=exp(cv.Grid_dist$RMSE)-1
-cv.Grid_dist$MAE_nlog=exp(cv.Grid_dist$MAE)-1
-
-summary(best.cv.Grid$RMSE_nlog)
-
-
+#leave one out cross validation results 
 best.cv.Grid=cv.Grid %>%
   group_by(Day) %>%
   slice(which.min(RMSE))
